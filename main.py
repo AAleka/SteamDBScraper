@@ -61,6 +61,7 @@ def send_email(n, sender, password, receiver_email, receiver_name, save_name):
                             <td style="border: 1px solid white; border-collapse: collapse;">Price</td>
                             <td style="border: 1px solid white; border-collapse: collapse;">Discount</td>
                             <td style="border: 1px solid white; border-collapse: collapse;">Lowest price</td>
+                            <td style="border: 1px solid white; border-collapse: collapse;">Comment</td>
                         </tr>
     ''' % receiver_name
 
@@ -77,10 +78,28 @@ def send_email(n, sender, password, receiver_email, receiver_name, save_name):
         new_datas = json.load(f)
         f.close()
 
+    comments = []
+
     if len(old_datas['name']) == len(new_datas['name']):
         for i in range(len(old_datas['name'])):
+            currency_symbol = new_datas['price'][i][0]
+            new_price = float(new_datas['price'][i][1:].replace(',', '.'))
+            old_price = float(old_datas['price'][i][1:].replace(',', '.'))
+            lowest_price = float(old_datas['lowest_price'][i][1:].replace(',', '.'))
             if old_datas['price'][i] != new_datas['price'][i]:
                 new_datas['price'][i] += ' (' + old_datas['price'][i] + ')'
+                if new_price < old_price:
+                    if new_price < lowest_price:
+                        comments.append(
+                            f"You can save {currency_symbol}{round(lowest_price - new_price, 2)} compared to the lowest "
+                            f"price.")
+                    else:
+                        comments.append(
+                            f"You can save {currency_symbol}{round(old_price - new_price, 2)} compared to the old price, "
+                            f"\nbut you will lose {currency_symbol}{round(new_price - lowest_price, 2)} compared to the "
+                            f"lowest price.")
+            else:
+                comments.append("No comment.")
 
     with open(f"out/{temp_name}_{n}.json", 'rb') as f:
         file_attachment = MIMEApplication(f.read())
@@ -95,12 +114,14 @@ def send_email(n, sender, password, receiver_email, receiver_name, save_name):
                         <td style="border: 1px solid white; border-collapse: collapse;">%s</td>
                         <td style="border: 1px solid white; border-collapse: collapse;">%s</td>
                         <td style="border: 1px solid white; border-collapse: collapse;">%s</td>
+                        <td style="border: 1px solid white; border-collapse: collapse;">%s</td>
                     </tr>
         ''' % (f"https://steamdb.info/app/{new_datas['ID'][i]}",
                new_datas['name'][i],
                new_datas['price'][i],
                new_datas['discount'][i],
-               new_datas['lowest_price'][i])
+               new_datas['lowest_price'][i],
+               comments[i])
 
     html += '''\n
                     </table>
@@ -163,20 +184,14 @@ for i, customer_data in enumerate(customers_data):
     }
     if customer_data['subscribed']:
         for j, ID in enumerate(gameIds):
-            # user_agent = get_user_agent(api_key, num_results, user_agent_endpoint)
-            # browser_header = get_browser_header(api_key, num_results, browser_header_endpoint)
-
             options = webdriver.ChromeOptions()
             options.add_argument("--headless")
             options.add_argument("--no-sandbox")
-            # options.add_argument("start-maximized")
             options.add_argument('--disable-dev-shm-usage')
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
             options.add_experimental_option('useAutomationExtension', False)
-            # options.add_argument(f'--user-agent={user_agent}')
 
             service = Service('drivers/chromedriver')
-
             driver = webdriver.Chrome(service=service, options=options)
 
             try:
