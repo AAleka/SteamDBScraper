@@ -101,7 +101,7 @@ def send_email(n, sender, password, receiver_email, receiver_name, save_name):
                             f"\nbut you will lose {currency_symbol}{round(new_price-lowest_price, 2)} compared to the "
                             f"lowest price.")
             else:
-                comments.append("No comment.")
+                comments.append("Do not buy.")
 
     with open(f"out/{temp_name}_{n}.json", 'rb') as f:
         file_attachment = MIMEApplication(f.read())
