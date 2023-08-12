@@ -117,6 +117,7 @@ def send_email(n, sender, password, receiver_email, receiver_name, save_name):
                         <td style="border: 1px solid white; border-collapse: collapse;">%s</td>
                         <td style="border: 1px solid white; border-collapse: collapse;">%s</td>
                         <td style="border: 1px solid white; border-collapse: collapse;">%s</td>
+                        <td style="border: 1px solid white; border-collapse: collapse;">%s</td>
                     </tr>
         ''' % (f"https://steamdb.info/app/{new_datas['ID'][i]}",
                new_datas['name'][i],
