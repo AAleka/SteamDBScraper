@@ -93,12 +93,12 @@ def send_email(n, sender, password, receiver_email, receiver_name, save_name):
                 if new_price < old_price:
                     if new_price < lowest_price:
                         comments.append(
-                            f"You can save {currency_symbol}{round(lowest_price - new_price, 2)} compared to the lowest "
+                            f"You can save {currency_symbol}{round(lowest_price-new_price, 2)} compared to the lowest "
                             f"price.")
                     else:
                         comments.append(
-                            f"You can save {currency_symbol}{round(old_price - new_price, 2)} compared to the old price, "
-                            f"\nbut you will lose {currency_symbol}{round(new_price - lowest_price, 2)} compared to the "
+                            f"You can save {currency_symbol}{round(old_price-new_price, 2)} compared to the old price, "
+                            f"\nbut you will lose {currency_symbol}{round(new_price-lowest_price, 2)} compared to the "
                             f"lowest price.")
             else:
                 comments.append("No comment.")
