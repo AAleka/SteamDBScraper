@@ -142,12 +142,6 @@ password = config_data['password']
 save_name = config_data['save_name']
 temp_name = config_data['temp_name']
 
-api_key = config_data['API_KEY']
-user_agent_endpoint = config_data['FAKE_USER_AGENT_ENDPOINT']
-browser_header_endpoint = config_data['FAKE_BROWSER_HEADER_ENDPOINT']
-proxy_endpoint = config_data['PROXY_ENDPOINT']
-num_results = config_data['SCRAPEOPS_NUM_RESULTS']
-
 for i, customer_data in enumerate(customers_data):
     customer_email = customer_data['email']
     customer_name = customer_data['name']
@@ -164,7 +158,7 @@ for i, customer_data in enumerate(customers_data):
     if customer_data['subscribed']:
         for j, ID in enumerate(gameIds):
             options = webdriver.ChromeOptions()
-            # options.add_argument("--headless")
+            options.add_argument("--headless")
             options.add_argument("--no-sandbox")
             options.add_argument('--disable-dev-shm-usage')
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
