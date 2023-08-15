@@ -3,9 +3,6 @@
 import os.path
 import pickle
 import random
-from random import randint
-from urllib.parse import urlencode
-import requests
 
 import time
 import json
@@ -24,29 +21,6 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
-
-
-def get_user_agent(api_key, num_results, endpoint):
-    payload = {'api_key' : api_key}
-    if num_results is not None:
-        payload['num_results'] = num_results
-
-    response = requests.get(endpoint, params=urlencode(payload))
-    json_response = response.json()
-    user_agents_list = json_response.get('result', [])
-
-    return user_agents_list[randint(0, len(user_agents_list)-1)]
-
-
-def get_browser_header(api_key, num_results, endpoint):
-    payload = {'api_key': api_key}
-    if num_results is not None:
-        payload['num_results'] = num_results
-    response = requests.get(endpoint, params=urlencode(payload))
-    json_response = response.json()
-    headers_list = json_response.get('result', [])
-
-    return headers_list[randint(0, len(headers_list) - 1)]
 
 
 def send_email(n, sender, password, receiver_email, receiver_name, save_name):
@@ -84,24 +58,27 @@ def send_email(n, sender, password, receiver_email, receiver_name, save_name):
 
     if len(old_datas['name']) == len(new_datas['name']):
         for i in range(len(old_datas['name'])):
-            currency_symbol = new_datas['price'][i][0]
-            new_price = float(new_datas['price'][i][1:].replace(',', '.'))
-            old_price = float(old_datas['price'][i][1:].replace(',', '.'))
-            lowest_price = float(old_datas['lowest_price'][i][1:].replace(',', '.'))
-            if old_datas['price'][i] != new_datas['price'][i]:
-                new_datas['price'][i] += ' (' + old_datas['price'][i] + ')'
-                if new_price < old_price:
-                    if new_price < lowest_price:
-                        comments.append(
-                            f"You can save {currency_symbol}{round(lowest_price-new_price, 2)} compared to the lowest "
-                            f"price.")
-                    else:
-                        comments.append(
-                            f"You can save {currency_symbol}{round(old_price-new_price, 2)} compared to the old price, "
-                            f"\nbut you will lose {currency_symbol}{round(new_price-lowest_price, 2)} compared to the "
-                            f"lowest price.")
+            if new_datas['price'][i] != 0 and old_datas['price'][i] != 0:
+                currency_symbol = new_datas['price'][i][0]
+                new_price = float(new_datas['price'][i][1:].replace(',', '.'))
+                old_price = float(old_datas['price'][i][1:].replace(',', '.'))
+                lowest_price = float(old_datas['lowest_price'][i][1:].replace(',', '.'))
+                if old_datas['price'][i] != new_datas['price'][i]:
+                    new_datas['price'][i] += ' (' + old_datas['price'][i] + ')'
+                    if new_price < old_price:
+                        if new_price < lowest_price:
+                            comments.append(
+                                f"You can save {currency_symbol}{round(lowest_price-new_price, 2)} compared to the "
+                                f"lowest price.")
+                        else:
+                            comments.append(
+                                f"You can save {currency_symbol}{round(old_price-new_price, 2)} compared to the old "
+                                f"price, \nbut you will lose {currency_symbol}{round(new_price-lowest_price, 2)} compared to the"
+                                f"lowest price.")
+                else:
+                    comments.append("Do not buy.")
             else:
-                comments.append("Do not buy.")
+                comments.append("No comment.")
 
     with open(f"out/{temp_name}_{n}.json", 'rb') as f:
         file_attachment = MIMEApplication(f.read())
@@ -187,7 +164,7 @@ for i, customer_data in enumerate(customers_data):
     if customer_data['subscribed']:
         for j, ID in enumerate(gameIds):
             options = webdriver.ChromeOptions()
-            options.add_argument("--headless")
+            # options.add_argument("--headless")
             options.add_argument("--no-sandbox")
             options.add_argument('--disable-dev-shm-usage')
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -196,16 +173,17 @@ for i, customer_data in enumerate(customers_data):
             service = Service('drivers/chromedriver')
             driver = webdriver.Chrome(service=service, options=options)
 
+            stealth(
+                driver,
+                languages=["en-US", "en"],
+                vendor="Google Inc.",
+                platform="Win32",
+                webgl_vendor="Intel Inc.",
+                renderer="Intel Iris OpenGL Engine",
+                fix_hairline=True,
+            )
+
             try:
-                stealth(
-                    driver,
-                    languages=["en-US", "en"],
-                    vendor="Google Inc.",
-                    platform="Win32",
-                    webgl_vendor="Intel Inc.",
-                    renderer="Intel Iris OpenGL Engine",
-                    fix_hairline=True,
-                )
                 time.sleep(random.randint(5, 10))
                 driver.get(f'{url}/{ID}/')
 
@@ -289,11 +267,8 @@ for i, customer_data in enumerate(customers_data):
             with open(f"out/{save_name}_{i}.json", "w") as outfile:
                 json.dump(games, outfile)
 
-            with open(f"out/{temp_name}_{i}.json", "w") as outfile:
-                json.dump(games, outfile)
-        else:
-            with open(f"out/{temp_name}_{i}.json", "w") as outfile:
-                json.dump(games, outfile)
+        with open(f"out/{temp_name}_{i}.json", "w") as outfile:
+            json.dump(games, outfile)
 
         send_email(i, sender, password, customer_email, customer_name, save_name)
 
