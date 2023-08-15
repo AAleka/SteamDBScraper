@@ -73,8 +73,8 @@ def send_email(n, sender, password, receiver_email, receiver_name, save_name):
                         else:
                             comments.append(
                                 f"You can save {currency_symbol}{round(old_price-new_price, 2)} compared to the old "
-                                f"price, \nbut you will lose {currency_symbol}{round(new_price-lowest_price, 2)} compared to the "
-                                f"lowest price.")
+                                f"price, \nbut you will lose {currency_symbol}{round(new_price-lowest_price, 2)} compared to the"
+                                f" lowest price.")
                 else:
                     comments.append("Do not buy.")
             else:
