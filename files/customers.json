@@ -1,0 +1,17 @@
+[
+	{
+		"email": "<email address>",
+		"name": "<name>",
+		"games": [2331960, 1147500],
+		"currency": "<currency>",
+		"subscribed": 1
+	},
+	{
+		"email": "<email address>",
+		"name": "<name>",
+		"games": [2230090, 1379110],
+		"currency": "<currency>",
+		"subscribed": 1
+	}
+]
+
