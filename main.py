@@ -46,11 +46,11 @@ def send_email(n, sender, password, receiver_email, receiver_name, save_name):
     email_msg['From'] = sender
     email_msg['To'] = receiver_email
 
-    with open(f"out/{save_name}_{n}.json", 'rb') as f:
+    with open(f"files/{save_name}_{n}.json", 'rb') as f:
         old_datas = json.load(f)
         f.close()
 
-    with open(f"out/{temp_name}_{n}.json", 'rb') as f:
+    with open(f"files/{temp_name}_{n}.json", 'rb') as f:
         new_datas = json.load(f)
         f.close()
 
@@ -80,11 +80,11 @@ def send_email(n, sender, password, receiver_email, receiver_name, save_name):
             else:
                 comments.append("No comment.")
 
-    with open(f"out/{temp_name}_{n}.json", 'rb') as f:
+    with open(f"files/{temp_name}_{n}.json", 'rb') as f:
         file_attachment = MIMEApplication(f.read())
         f.close()
 
-    shutil.copyfile(f"out/{temp_name}_{n}.json", f"out/{save_name}_{n}.json")
+    shutil.copyfile(f"files/{temp_name}_{n}.json", f"files/{save_name}_{n}.json")
 
     for i in range(len(new_datas['name'])):
         html += '''\n
@@ -129,11 +129,11 @@ def send_email(n, sender, password, receiver_email, receiver_name, save_name):
 
 url = 'https://steamdb.info/app'
 
-with open('configs/config.json', 'r') as config_file:
+with open('files/config.json', 'r') as config_file:
     config_data = json.load(config_file)
     config_file.close()
 
-with open('configs/customers.json', 'r') as customers_file:
+with open('files/customers.json', 'r') as customers_file:
     customers_data = json.load(customers_file)
     customers_file.close()
 
@@ -164,7 +164,7 @@ for i, customer_data in enumerate(customers_data):
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
             options.add_experimental_option('useAutomationExtension', False)
 
-            service = Service('drivers/chromedriver')
+            service = Service('/usr/bin/chromedriver')
             driver = webdriver.Chrome(service=service, options=options)
 
             stealth(
@@ -185,10 +185,10 @@ for i, customer_data in enumerate(customers_data):
                     time.sleep(random.randint(5, 10))
                     driver.get(f'{url}/{ID}')
 
-                if not os.path.exists("drivers/cookies.pkl"):
-                    pickle.dump(driver.get_cookies(), open("drivers/cookies.pkl", "wb"))
+                if not os.path.exists("files/cookies.pkl"):
+                    pickle.dump(driver.get_cookies(), open("files/cookies.pkl", "wb"))
                 else:
-                    cookies = pickle.load(open("drivers/cookies.pkl", "rb"))
+                    cookies = pickle.load(open("files/cookies.pkl", "rb"))
                     for cookie in cookies:
                         driver.add_cookie(cookie)
 
@@ -257,11 +257,11 @@ for i, customer_data in enumerate(customers_data):
 
             driver.close()
 
-        if not os.path.exists(f"out/{save_name}_{i}.json"):
-            with open(f"out/{save_name}_{i}.json", "w") as outfile:
+        if not os.path.exists(f"files/{save_name}_{i}.json"):
+            with open(f"files/{save_name}_{i}.json", "w") as outfile:
                 json.dump(games, outfile)
 
-        with open(f"out/{temp_name}_{i}.json", "w") as outfile:
+        with open(f"files/{temp_name}_{i}.json", "w") as outfile:
             json.dump(games, outfile)
 
         send_email(i, sender, password, customer_email, customer_name, save_name)
