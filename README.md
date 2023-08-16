@@ -1,4 +1,5 @@
 # SteamDBScraper
-1. Add config.json and customers.json to config directory.
-2. Run "docker build --platform linux/amd64 -t steamdb_selenium-img ."
-3. Run "docker run --rm -v /path/to/host/directory/files:/steam_scrape/files steamdb_selenium-img"
+1. Edit config.json and customers.json in files directory.
+2. Move files directory anywhere you want.
+3. Run "docker build --platform linux/amd64 -t steamdb_selenium-img ."
+4. Run "docker run --rm -v /path/to/host/directory/files:/steam_scrape/files steamdb_selenium-img"
